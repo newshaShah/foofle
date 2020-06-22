@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ec731463-0f92-4250-ab79-9cf151d20123" name="Default Changelist" comment="sql file added">
+    <list default="true" id="ec731463-0f92-4250-ab79-9cf151d20123" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/foofle.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/foofle.sql" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,8 +21,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="130">
-              <caret line="377" column="24" selection-start-line="377" selection-start-column="24" selection-end-line="377" selection-end-column="24" />
+            <state relative-caret-position="5742">
+              <caret line="371" column="30" lean-forward="true" selection-start-line="371" selection-start-column="30" selection-end-line="371" selection-end-column="30" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -147,7 +148,21 @@
       <option name="project" value="LOCAL" />
       <updated>1592510134602</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="delete from sent added">
+      <created>1592840672345</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1592840672345</updated>
+    </task>
+    <task id="LOCAL-00003" summary="delete from sent added">
+      <created>1592840812517</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1592840812517</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -162,7 +177,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.6497545" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.87397707" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -183,7 +198,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="sql file added" />
-    <option name="LAST_COMMIT_MESSAGE" value="sql file added" />
+    <MESSAGE value="delete from sent added" />
+    <option name="LAST_COMMIT_MESSAGE" value="delete from sent added" />
   </component>
   <component name="WindowStateProjectService">
     <state x="275" y="22" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592078758930">
@@ -205,8 +221,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="377" column="24" selection-start-line="377" selection-start-column="24" selection-end-line="377" selection-end-column="24" />
+        <state relative-caret-position="5742">
+          <caret line="371" column="30" lean-forward="true" selection-start-line="371" selection-start-column="30" selection-end-line="371" selection-end-column="30" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

@@ -35,7 +35,7 @@ class Main{
             System.out.println("    13 --------- <Delete a specific email from inbox> ");
             System.out.println("    14 --------- <Delete a specific sent email> ");
             System.out.println("    15 --------- <Block a user so this user wouldn't be able to see your account information> ");
-            System.out.println("    16 --------- <Unblock a user so this user can see see your account information> ");
+            System.out.println("    16 --------- <Unblock a user so this user can see your account information> ");
             System.out.println("-------------------------------------------------------------------------------------------");
             boolean flag = true;
             while(flag){
@@ -374,7 +374,7 @@ class Main{
                     case 14:
                         query =  "{CALL delete_sent_email(?)}";
                         stmt = con.prepareCall(query);
-                        System.out.print("Enter exact time of your received email: ");
+                        System.out.print("Enter exact time of your sent email: ");
                         scanner.nextLine();
                         time = scanner.nextLine();
                         stmt.setString(1, time);

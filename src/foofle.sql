@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 18, 2020 at 09:53 PM
+-- Generation Time: Jun 22, 2020 at 08:25 PM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.2
 
@@ -129,6 +129,22 @@ BEGIN
     values(@message,@Username,CURRENT_TIME());
 end$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_sent_email` (IN `Time` TIMESTAMP)  NO SQL
+BEGIN
+	call get_last_login(@Username);
+
+    SET @senderEmail = (Select CONCAT (@Username,"@foofle.com"));
+	update email
+	set email.deleteForSender = 1
+    where email.sender = @senderEmail and 
+    email.time = Time;
+
+    
+    SET @message = (Select CONCAT ("You have successfully deleted an email which was sent in: " ,Time));
+    insert into news(news.text,news.account,news.time)
+    values(@message,@Username,CURRENT_TIME());
+end$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `edit_account` (IN `Firstname` VARCHAR(20), IN `Lastname` VARCHAR(20), IN `Alias` VARCHAR(20), IN `Address` VARCHAR(100), IN `Birthdate` VARCHAR(10), IN `Phone` VARCHAR(11), IN `Nationalid` VARCHAR(20), IN `Password` VARCHAR(40), IN `Accountphone` CHAR(11))  NO SQL
 begin
 call get_last_login(@Username);
@@ -169,7 +185,7 @@ SET @senderEmail = (Select CONCAT (@Username,"@foofle.com"));
 set page = (page  - 1)*10;
 SELECT email.subject,email.time,emailreceiver.receiver,emailreceiver.isRead,emailreceiver.isCC
 from emailreceiver,email
-where email.sender = @senderEmail and email.sender=emailreceiver.sender and email.time = emailreceiver.time 
+where email.sender = @senderEmail and email.sender=emailreceiver.sender and email.time = emailreceiver.time and email.deleteForSender <>1
 order by email.time DESC
 LIMIT  10 OFFSET page;
 end$$
@@ -288,7 +304,7 @@ call get_last_login(@Username);
 SET @senderEmail = (Select CONCAT (@Username,"@foofle.com"));
 select text 
 from email 
-where sender = @senderEmail and email.time = Time;
+where sender = @senderEmail and email.time = Time and email.deleteForSender = 0;
 
 end$$
 
@@ -501,24 +517,35 @@ INSERT INTO `blocked_users` (`firstUser`, `secondUser`) VALUES
 --
 
 CREATE TABLE `email` (
-  `sender` varchar(20) NOT NULL,
+  `sender` varchar(40) NOT NULL,
   `subject` varchar(30) NOT NULL,
-  `time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `text` varchar(1000) NOT NULL
+  `time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `text` varchar(1000) NOT NULL,
+  `deleteForSender` int(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `email`
 --
 
-INSERT INTO `email` (`sender`, `subject`, `time`, `text`) VALUES
-('niloofar@foofle.com', 'email1', '2020-06-18 18:35:40', 'This is a test'),
-('niloofar@foofle.com', 'email_1', '2020-06-18 18:37:43', 'This is a test'),
-('vahi75@foofle.com', 'email2', '2020-06-18 18:39:12', 'This is second email'),
-('vahi75@foofle.com', 'test', '2020-06-18 18:42:06', 'thtfgvkhvciyfgyhjb'),
-('vahi75@foofle.com', 'test', '2020-06-18 18:42:36', 'thtfgvkhvciyfgyhjb'),
-('vahi75@foofle.com', 'test', '2020-06-18 18:42:40', 'thtfgvkhvciyfgyhjb'),
-('vahi75@foofle.com', 'bread', '2020-06-18 18:46:07', 'please buy bread on your way back home');
+INSERT INTO `email` (`sender`, `subject`, `time`, `text`, `deleteForSender`) VALUES
+('h_shahbodagh@foofle.', 'project', '2020-06-22 18:00:32', 'dear Hossein please come home', 0),
+('h_shahbodagh@foofle.', 'project', '2020-06-22 18:00:33', 'dear Hossein please come home', 0),
+('k1shah@foofle.com', 'k1email', '2020-06-22 16:18:29', 'this is a test email', 1),
+('k1shah@foofle.com', 'blueberry', '2020-06-22 17:46:48', 'werthbvcxa', 0),
+('k1shah@foofle.com', 'yellow', '2020-06-22 17:49:57', 'werfcds', 1),
+('niloofar@foofle.com', 'email1', '2020-06-18 18:35:40', 'This is a test', 0),
+('niloofar@foofle.com', 'email_1', '2020-06-18 18:37:43', 'This is a test', 0),
+('rojin88@foofle.com', 'project', '2020-06-22 18:03:52', 'rtyuio', 1),
+('rojin88@foofle.com', 'flower', '2020-06-22 18:17:40', 'this is a text', 1),
+('tara77@foofle.com', 'tataEmail', '2020-06-22 15:42:18', 'ertyuiolkjhgfdxcvbn', 1),
+('tara77@foofle.com', 'taraEmail', '2020-06-22 16:50:37', 'tyuiookjhgfd', 1),
+('tara77@foofle.com', 'melon', '2020-06-22 17:25:11', 'buy melon', 0),
+('vahi75@foofle.com', 'email2', '2020-06-18 18:39:12', 'This is second email', 0),
+('vahi75@foofle.com', 'test', '2020-06-18 18:42:06', 'thtfgvkhvciyfgyhjb', 0),
+('vahi75@foofle.com', 'test', '2020-06-18 18:42:36', 'thtfgvkhvciyfgyhjb', 0),
+('vahi75@foofle.com', 'test', '2020-06-18 18:42:40', 'thtfgvkhvciyfgyhjb', 0),
+('vahi75@foofle.com', 'bread', '2020-06-18 18:46:07', 'please buy bread on your way back home', 0);
 
 -- --------------------------------------------------------
 
@@ -527,9 +554,9 @@ INSERT INTO `email` (`sender`, `subject`, `time`, `text`) VALUES
 --
 
 CREATE TABLE `emailreceiver` (
-  `sender` varchar(20) NOT NULL,
-  `time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `receiver` varchar(20) NOT NULL,
+  `sender` varchar(40) NOT NULL,
+  `time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `receiver` varchar(40) NOT NULL,
   `isRead` int(1) NOT NULL DEFAULT 0,
   `isCC` int(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -561,7 +588,7 @@ INSERT INTO `emailreceiver` (`sender`, `time`, `receiver`, `isRead`, `isCC`) VAL
 ('vahi75@foofle.com', '2020-06-18 18:42:36', 'royaaaaa@foofle.com', 0, 0),
 ('vahi75@foofle.com', '2020-06-18 18:42:36', 'hasan66@foofle.com', 0, 1),
 ('vahi75@foofle.com', '2020-06-18 18:42:36', 'niloofar@foofle.com', 0, 1),
-('vahi75@foofle.com', '2020-06-18 18:42:40', 'mary78@foofle.com', 0, 0),
+('vahi75@foofle.com', '2020-06-22 15:33:19', 'mary78@foofle.com', 1, 0),
 ('vahi75@foofle.com', '2020-06-18 18:42:40', 'newsha@foofle.com', 0, 0),
 ('vahi75@foofle.com', '2020-06-18 18:42:40', 'royaaaaa@foofle.com', 0, 0),
 ('vahi75@foofle.com', '2020-06-18 18:42:40', 'hasan66@foofle.com', 0, 1),
@@ -569,7 +596,33 @@ INSERT INTO `emailreceiver` (`sender`, `time`, `receiver`, `isRead`, `isCC`) VAL
 ('vahi75@foofle.com', '2020-06-18 18:46:07', 'newsha@foofle.com', 0, 0),
 ('vahi75@foofle.com', '2020-06-18 18:46:07', 'niloofar@foofle.com', 0, 0),
 ('vahi75@foofle.com', '2020-06-18 18:46:07', 'hasan66@foofle.com', 0, 1),
-('vahi75@foofle.com', '2020-06-18 18:46:07', 'royaaaaa@foofle.com', 0, 1);
+('vahi75@foofle.com', '2020-06-18 18:46:07', 'royaaaaa@foofle.com', 0, 1),
+('tara77@foofle.com', '2020-06-22 15:37:57', 'newsha@foofle.com', 0, 0),
+('tara77@foofle.com', '2020-06-22 15:37:57', 'sarar@foofle.com', 0, 0),
+('tara77@foofle.com', '2020-06-22 15:37:57', 'vahi75@foofle.com', 0, 0),
+('tara77@foofle.com', '2020-06-22 15:37:57', 'niloofar@foofle.com', 0, 1),
+('tara77@foofle.com', '2020-06-22 15:37:57', 'royaaaaa@foofle.com', 0, 1),
+('tara77@foofle.com', '2020-06-22 15:37:57', 'mary78@foofle.com', 0, 1),
+('k1shah@foofle.com', '2020-06-22 16:39:29', 'tara77@foofle.com', 1, 0),
+('k1shah@foofle.com', '2020-06-22 16:16:17', 'newsha@foofle.com', 0, 0),
+('k1shah@foofle.com', '2020-06-22 16:16:17', 'royaaaaa@foofle.com', 0, 0),
+('k1shah@foofle.com', '2020-06-22 16:16:17', 'sarar@foofle.com', 0, 1),
+('k1shah@foofle.com', '2020-06-22 16:16:17', 'vahi75@foofle.com', 0, 1),
+('tara77@foofle.com', '2020-06-22 16:48:33', 'k1shah@foofle.com', 0, 0),
+('tara77@foofle.com', '2020-06-22 17:25:11', 'newsha@foofle.com', 0, 0),
+('tara77@foofle.com', '2020-06-22 17:28:19', 'k1shah@foofle.com', 1, 0),
+('tara77@foofle.com', '2020-06-22 17:25:11', 'royaaaaa@foofle.com', 0, 0),
+('k1shah@foofle.com', '2020-06-22 17:46:47', 'newsha@foofle.com', 0, 0),
+('k1shah@foofle.com', '2020-06-22 17:46:48', 'royaaaaa@foofle.com', 0, 0),
+('k1shah@foofle.com', '2020-06-22 17:46:48', 'tara77@foofle.com', 0, 0),
+('k1shah@foofle.com', '2020-06-22 17:49:57', 'tara77@foofle.com', 0, 0),
+('rojin88@foofle.com', '2020-06-22 18:03:52', 'tara77@foofle.com', 1, 0),
+('rojin88@foofle.com', '2020-06-22 18:03:53', 'k1shah@foofle.com', 0, 0),
+('rojin88@foofle.com', '2020-06-22 18:03:53', 'newsha@foofle.com', 0, 0),
+('rojin88@foofle.com', '2020-06-22 18:17:40', 'tara77@foofle.com', 0, 0),
+('rojin88@foofle.com', '2020-06-22 18:17:40', 'newsha@foofle.com', 0, 0),
+('rojin88@foofle.com', '2020-06-22 18:17:40', 'royaaaaa@foofle.com', 0, 0),
+('rojin88@foofle.com', '2020-06-22 18:17:40', 'k1shah@foofle.com', 0, 1);
 
 --
 -- Triggers `emailreceiver`
@@ -611,7 +664,25 @@ INSERT INTO `logs` (`user`, `time`) VALUES
 ('mary78', '2020-06-18 17:13:24'),
 ('niloofar', '2020-06-18 18:34:38'),
 ('vahi75', '2020-06-18 18:38:10'),
-('mary78', '2020-06-18 19:12:56');
+('mary78', '2020-06-18 19:12:56'),
+('tara77', '2020-06-22 15:35:27'),
+('k1shah', '2020-06-22 16:15:14'),
+('tara77', '2020-06-22 16:19:19'),
+('k1shah', '2020-06-22 16:48:54'),
+('tara77', '2020-06-22 16:49:45'),
+('k1shah', '2020-06-22 16:51:13'),
+('tara77', '2020-06-22 17:00:12'),
+('k1shah', '2020-06-22 17:27:05'),
+('k1shah', '2020-06-22 17:48:01'),
+('tara77', '2020-06-22 17:50:14'),
+('k1shah', '2020-06-22 17:50:34'),
+('tara77', '2020-06-22 17:53:29'),
+('rojin88', '2020-06-22 18:03:26'),
+('tara77', '2020-06-22 18:04:33'),
+('rojin88', '2020-06-22 18:08:08'),
+('tara77', '2020-06-22 18:18:18'),
+('rojin88', '2020-06-22 18:21:53'),
+('tara77', '2020-06-22 18:22:38');
 
 --
 -- Triggers `logs`
@@ -752,7 +823,64 @@ INSERT INTO `news` (`text`, `account`, `time`) VALUES
 ('you have a new email from:  vahi75@foofle.com', 'hasan66', '2020-06-18 18:46:07'),
 ('you have a new email from:  vahi75@foofle.com', 'royaaaaa', '2020-06-18 18:46:07'),
 ('User logged in successfully', 'mary78', '2020-06-18 19:12:56'),
-('You have successfully deleted an email from: vahi75', 'mary78', '2020-06-18 19:13:20');
+('You have successfully deleted an email from: vahi75', 'mary78', '2020-06-18 19:13:20'),
+('User signed up successfully', 'tara77', '2020-06-22 15:35:12'),
+('User logged in successfully', 'tara77', '2020-06-22 15:35:27'),
+('you have a new email from:  tara77@foofle.com', 'newsha', '2020-06-22 15:37:57'),
+('you have a new email from:  tara77@foofle.com', 'sarar', '2020-06-22 15:37:57'),
+('you have a new email from:  tara77@foofle.com', 'vahi75', '2020-06-22 15:37:57'),
+('you have a new email from:  tara77@foofle.com', 'niloofar', '2020-06-22 15:37:57'),
+('you have a new email from:  tara77@foofle.com', 'royaaaaa', '2020-06-22 15:37:57'),
+('you have a new email from:  tara77@foofle.com', 'mary78', '2020-06-22 15:37:57'),
+('You have successfully deleted an email which was sent in: 2020-06-22 20:07:57', 'tara77', '2020-06-22 15:42:18'),
+('User signed up successfully', 'k1shah', '2020-06-22 16:14:53'),
+('User logged in successfully', 'k1shah', '2020-06-22 16:15:14'),
+('you have a new email from:  k1shah@foofle.com', 'tara77', '2020-06-22 16:16:17'),
+('you have a new email from:  k1shah@foofle.com', 'newsha', '2020-06-22 16:16:17'),
+('you have a new email from:  k1shah@foofle.com', 'royaaaaa', '2020-06-22 16:16:17'),
+('you have a new email from:  k1shah@foofle.com', 'sarar', '2020-06-22 16:16:17'),
+('you have a new email from:  k1shah@foofle.com', 'vahi75', '2020-06-22 16:16:17'),
+('You have successfully deleted an email which was sent in: 2020-06-22 20:46:17', 'k1shah', '2020-06-22 16:18:29'),
+('User logged in successfully', 'tara77', '2020-06-22 16:19:19'),
+('you have a new email from:  tara77@foofle.com', 'k1shah', '2020-06-22 16:48:33'),
+('User logged in successfully', 'k1shah', '2020-06-22 16:48:54'),
+('User logged in successfully', 'tara77', '2020-06-22 16:49:45'),
+('You have successfully deleted an email which was sent in: 2020-06-22 21:18:33', 'tara77', '2020-06-22 16:50:38'),
+('User logged in successfully', 'k1shah', '2020-06-22 16:51:13'),
+('User logged in successfully', 'tara77', '2020-06-22 17:00:12'),
+('you have a new email from:  tara77@foofle.com', 'newsha', '2020-06-22 17:25:11'),
+('you have a new email from:  tara77@foofle.com', 'k1shah', '2020-06-22 17:25:11'),
+('you have a new email from:  tara77@foofle.com', 'royaaaaa', '2020-06-22 17:25:11'),
+('User logged in successfully', 'k1shah', '2020-06-22 17:27:05'),
+('you have a new email from:  k1shah@foofle.com', 'newsha', '2020-06-22 17:46:47'),
+('you have a new email from:  k1shah@foofle.com', 'royaaaaa', '2020-06-22 17:46:48'),
+('you have a new email from:  k1shah@foofle.com', 'tara77', '2020-06-22 17:46:48'),
+('User logged in successfully', 'k1shah', '2020-06-22 17:48:01'),
+('you have a new email from:  k1shah@foofle.com', 'tara77', '2020-06-22 17:49:57'),
+('User logged in successfully', 'tara77', '2020-06-22 17:50:14'),
+('User logged in successfully', 'k1shah', '2020-06-22 17:50:34'),
+('You have successfully deleted an email which was sent in: 2020-06-22 22:19:57', 'k1shah', '2020-06-22 17:52:28'),
+('User logged in successfully', 'tara77', '2020-06-22 17:53:29'),
+('h_shahbodagh requested to view your profile and had access to it ', 'sarar', '2020-06-22 17:58:56'),
+('you have a new email from:  h_shahbodagh@foofle.', 'tara77', '2020-06-22 18:00:32'),
+('you have a new email from:  h_shahbodagh@foofle.', 'newsha', '2020-06-22 18:00:32'),
+('you have a new email from:  h_shahbodagh@foofle.', 'royaaaaa', '2020-06-22 18:00:33'),
+('User signed up successfully', 'rojin88', '2020-06-22 18:02:56'),
+('User logged in successfully', 'rojin88', '2020-06-22 18:03:26'),
+('you have a new email from:  rojin88@foofle.com', 'tara77', '2020-06-22 18:03:52'),
+('you have a new email from:  rojin88@foofle.com', 'k1shah', '2020-06-22 18:03:53'),
+('you have a new email from:  rojin88@foofle.com', 'newsha', '2020-06-22 18:03:53'),
+('User logged in successfully', 'tara77', '2020-06-22 18:04:33'),
+('User logged in successfully', 'rojin88', '2020-06-22 18:08:08'),
+('You have successfully deleted an email which was sent in: 2020-06-22 22:33:52', 'rojin88', '2020-06-22 18:16:33'),
+('you have a new email from:  rojin88@foofle.com', 'tara77', '2020-06-22 18:17:40'),
+('you have a new email from:  rojin88@foofle.com', 'newsha', '2020-06-22 18:17:40'),
+('you have a new email from:  rojin88@foofle.com', 'royaaaaa', '2020-06-22 18:17:40'),
+('you have a new email from:  rojin88@foofle.com', 'k1shah', '2020-06-22 18:17:40'),
+('User logged in successfully', 'tara77', '2020-06-22 18:18:18'),
+('User logged in successfully', 'rojin88', '2020-06-22 18:21:53'),
+('You have successfully deleted an email which was sent in: 2020-06-22 22:47:40', 'rojin88', '2020-06-22 18:22:06'),
+('User logged in successfully', 'tara77', '2020-06-22 18:22:38');
 
 -- --------------------------------------------------------
 
@@ -814,11 +942,14 @@ INSERT INTO `user` (`firstName`, `lastName`, `alias`, `address`, `birthDate`, `p
 ('hasan', 'hasani', 'hasani', 'kjhgfdsdfghjk', '66.3.11', '0987654', '98767890', 'hasan66', '6c44e5cd17f0019c64b042e4a745412a', '2020-06-18 18:31:52', '0987654'),
 ('f1', 'l1', 'f1', 'jknkjbkjbkjbkjbkj', '67.3.5', '098765432', '0022857739', 'hgnvjf', '3354045a397621cd92406f1f98cde292', '2020-06-13 15:30:42', '0987612534'),
 ('hoda', 'hadi', 'hh', 'ktgfiyfyi', '81.12.1', '09147852', '7896541', 'hoda', '6ebe76c9fb411be97b3b0d48b791a7c9', '2020-06-12 17:05:39', '09787852414'),
+('k1', 'shai', 'kk', 'grfdcvkjhgjyfc', '39.1.1', '098765', '786787', 'k1shah', 'e10adc3949ba59abbe56e057f20f883e', '2020-06-22 16:14:53', '091235678'),
 ('Maryam', 'Adibi', 'mary', 'jdhfbvjeduwhfjfk', '78.6.31', '0987654321', '234567654', 'mary78', 'e10adc3949ba59abbe56e057f20f883e', '2020-06-18 08:06:41', '098765432'),
 ('Newsha', 'Shahbodagh', 'New', 'jkhnsduhcbiab', '78.6.24', '098765432', '09876543', 'newsha', 'fc7588193f4e8e5b919d203d2734c58b', '2020-06-11 19:30:00', '0365412854'),
 ('Niloofar', 'Ahmadi', 'Niloo', 'hkjbkuvjhbljh', '76.5.23', '0987659876', '098765r', 'niloofar', '71b3b26aaa319e0cdf6fdb8429c112b0', '2020-06-18 18:34:21', '09876543'),
+('rojin', 'salami', 'rojj', 'sdfhj', '88.2.1', '09876543', '45678', 'rojin88', 'd7251d9b060e8ee32f8a97b908478a3a', '2020-06-22 18:02:56', '09125546874'),
 ('roya', 'badiiii', 'kjfdjkc', 'lhwdlcnaljsd', '22.22.44', '0987654', '345678', 'royaaaaa', '9e079d89d66d33457fbd0fa039b24deb', '2020-06-13 15:00:55', '0912345678'),
 ('sara', 'rahimi', 'ss', 'dfkjvn kzjnvfk', '72.4.6', '09437762746', '00332433', 'sarar', 'e10adc3949ba59abbe56', '2020-06-12 16:21:57', '09876543'),
+('tara', 'talai', 'tata', 'rtyuiop[\';lkjh', '77.4.12', '09876543', '965923', 'tara77', '4607e782c4d86fd5364d7e4508bb10d9', '2020-06-22 15:35:12', '09785523645'),
 ('tina', 'mohammadi', 'tt', 'kjzhsvkhsbdk', '88.1.3', '098767', '34567', 'tina1', 'e10adc3949ba59abbe56', '2020-06-11 19:30:00', '09876543'),
 ('vahid', 'vahidi', 'vah', 'kjhgfghjkl', '76.12.23', '09876543', '878432', 'vahi75', '124bd1296bec0d9d93c7b52a71ad8d5b', '2020-06-18 17:04:44', '098765');
 
