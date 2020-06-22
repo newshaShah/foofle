@@ -32,9 +32,10 @@ class Main{
             System.out.println("    10 --------- <Read a specific email from inbox> ");
             System.out.println("    11 --------- <Read a specific sent email> ");
             System.out.println("    12 --------- <Get your sent emails> ");
-            System.out.println("    13 --------- <Delete a specific email> ");
-            System.out.println("    14 --------- <Block a user so this user wouldn't be able to see your account information> ");
-            System.out.println("    15 --------- <Unblock a user so this user can see see your account information> ");
+            System.out.println("    13 --------- <Delete a specific email from inbox> ");
+            System.out.println("    14 --------- <Delete a specific sent email> ");
+            System.out.println("    15 --------- <Block a user so this user wouldn't be able to see your account information> ");
+            System.out.println("    16 --------- <Unblock a user so this user can see see your account information> ");
             System.out.println("-------------------------------------------------------------------------------------------");
             boolean flag = true;
             while(flag){
@@ -369,7 +370,17 @@ class Main{
 
 
                         break;
+
                     case 14:
+                        query =  "{CALL delete_sent_email(?)}";
+                        stmt = con.prepareCall(query);
+                        System.out.print("Enter exact time of your received email: ");
+                        scanner.nextLine();
+                        time = scanner.nextLine();
+                        stmt.setString(1, time);
+                        stmt.executeQuery();
+                        break;
+                    case 15:
                         query =  "{CALL block_user(?)}";
                         stmt = con.prepareCall(query);
                         System.out.print("Which username do you want to block: ");
@@ -385,7 +396,7 @@ class Main{
                         System.out.println();
                         break;
 
-                    case 15:
+                    case 16:
 
                         query =  "{CALL unblock_user(?)}";
                         stmt = con.prepareCall(query);
